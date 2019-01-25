@@ -1,0 +1,10 @@
+
+
+select job_name as Job_Name ,job_execution_date Execution_Date,job_start_time Start_Time,job_end_time End_Time,job_status Job_Status from (
+select t1.job_name,t1.job_execution_date,t1.job_start_time,t1.job_end_time,t1.job_status,
+row_number() over(partition by t1.job_name order by t1.job_execution_date,t1.job_end_time desc) as latest_rec 
+from CSCLIBRARY.CSCLIBRARY_TIDAL_JOB_STATUS t1 where (job_name LIKE '%Populate_COMPONENT_NEGOTIATIONS_PRIMARY_F%' 
+    OR job_name LIKE '%Populate_COMPONENT_NEGOTIATIONS_F%' OR job_name LIKE '%Populate_NON_NEGOTIATED_COMPONENTS_F%') 
+and job_execution_date='01-24-2019') out_rec
+where out_rec.latest_rec=1 order by End_Time;
+
