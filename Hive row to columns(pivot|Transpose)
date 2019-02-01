@@ -1,0 +1,72 @@
+Query:
+
+select * from cost_digitization.test;
+
+Result for the above query:
+test.pid	     test.commodity_group	test.commodity_sub_group	test.commodity_subgroup_spend	test.commodity_subgroup_spend_percent	test.transformation_spend	test.transformation_spend_percentage
+ASR1000-6TGE	COMMUNICATIONS	      Phy	                        12232.90052                   	2.36	                          48069.4868	                    9.28
+ASR1000-6TGE	COMMUNICATIONS	      NPU	                         48662.08899	                  9.4	                            48069.4868	                    9.28
+
+=======================================================
+Herer my requirment is , i need to conver the commodity_sub_group row values to columns,below is the query to convert the row values to columns,
+
+Solution -1
+------------
+
+Query:
+select pid,commodity_group,
+ case when commodity_sub_group="Phy" then commodity_subgroup_spend end as Phy,
+ case when commodity_sub_group="NPU" then  commodity_subgroup_spend end as 	NPU
+ from (select * from cost_digitization.test) t1
+ 
+ Result for the above query:
+pid	         commodity_group	  phy	          npu
+ASR1000-6TGE	COMMUNICATIONS	  12232.90052	    NULL
+ASR1000-6TGE	COMMUNICATIONS	  NULL	          48662.08899
+
+
+-------------------------------------------------------------
+
+Herer we have null values , we need avoid the null values , below is the query to avod the above null values,
+
+Query :
+
+select pid,commodity_group,
+COLLECT_SET(Phy)[0] as phy_spend,
+COLLECT_SET(NPU)[0] as npu_spend
+from
+(select pid,commodity_group,
+ case when commodity_sub_group="Phy" then commodity_subgroup_spend end as Phy,
+ case when commodity_sub_group="NPU" then  commodity_subgroup_spend end as 	NPU
+ from (select * from cost_digitization.test) t1
+)t2
+group by pid,commodity_group;
+
+
+Result for the above query:
+pid	              commodity_group	    phy_spend	        npu_spend
+ASR1000-6TGE	    COMMUNICATIONS	      12232.90052	    48662.08899
+=================================================================================================
+
+
+Solution -2
+------------
+Here we have used the map() function to convert , this is easy why cpmpare to solution-1.
+
+Query:
+select pid,commodity_group,
+Min(commodity_sub_group_map['Phy']) as Phy_Spend,
+Min(commodity_sub_group_map['NPU']) as NPU_Spend,
+Min(commodity_sub_group_map_pct['Phy']) as phy_pct,
+Min(commodity_sub_group_map_pct['NPU']) as phy_pct
+from (select pid,commodity_group,map(commodity_sub_group,commodity_subgroup_spend) as commodity_sub_group_map,
+map(commodity_sub_group,commodity_subgroup_spend_percent) as commodity_sub_group_map_pct
+from (select * from cost_digitization.test) t1
+)t2
+ group by pid,commodity_group;
+ 
+ Result for the above query :here we have added one more extra map to get the percetage data.
+ pid	        commodity_group	  phy_spend	       npu_spend	      phy_pct	    phy_pct
+ASR1000-6TGE	COMMUNICATIONS	  12232.90052	4     8662.08899	      2.36	    9.4
+
+ 
