@@ -3,9 +3,9 @@ Query:
 select * from cost_digitization.test;
 
 Result for the above query:
-test.pid	     test.commodity_group	test.commodity_sub_group	test.commodity_subgroup_spend	test.commodity_subgroup_spend_percent	test.transformation_spend	test.transformation_spend_percentage
-ASR1000-6TGE	COMMUNICATIONS	      Phy	                        12232.90052                   	2.36	                          48069.4868	                    9.28
-ASR1000-6TGE	COMMUNICATIONS	      NPU	                         48662.08899	                  9.4	                            48069.4868	                    9.28
+test.pid	     test.commodity_group	test.commodity_sub_group	     test.commodity_subgroup_spend	test.commodity_subgroup_spend_percent	test.transformation_spend	test.transformation_spend_percentage
+ASR1000-6TGE	     COMMUNICATIONS	             Phy	                         12232.90052                  	2.36	                          48069.4868	                    9.28
+ASR1000-6TGE	     COMMUNICATIONS	             NPU	                         48662.08899	                  9.4	                            48069.4868	                    9.28
 
 =======================================================
 Herer my requirment is , i need to conver the commodity_sub_group row values to columns,below is the query to convert the row values to columns,
